@@ -1,44 +1,39 @@
-﻿using SkyLeave.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using SkyLeave.Domain.Entities;
 using SkyLeave.Domain.Interfaces;
 
 namespace SkyLeave.Infrastructure.Repositories
 {
     public class LeaveRequestRepository : ILeaveRequestRepository
     {
-        private readonly List<LeaveRequest> _leaveRequests = new();
-
-        public Task<IEnumerable<LeaveRequest>> GetAllAsync()
+        public List<LeaveRequest> GetAll()
         {
-            return Task.FromResult<IEnumerable<LeaveRequest>>(_leaveRequests);
-        }
-
-        public Task<LeaveRequest?> GetByIdAsync(int id)
-        {
-            var request = _leaveRequests.FirstOrDefault(lr => lr.Id == id);
-            return Task.FromResult(request);
-        }
-
-        public Task AddAsync(LeaveRequest leaveRequest)
-        {
-            leaveRequest.Id = _leaveRequests.Count + 1;
-            _leaveRequests.Add(leaveRequest);
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateAsync(LeaveRequest leaveRequest)
-        {
-            var index = _leaveRequests.FindIndex(lr => lr.Id == leaveRequest.Id);
-            if (index != -1)
-                _leaveRequests[index] = leaveRequest;
-            return Task.CompletedTask;
-        }
-
-        public Task DeleteAsync(int id)
-        {
-            var item = _leaveRequests.FirstOrDefault(lr => lr.Id == id);
-            if (item != null)
-                _leaveRequests.Remove(item);
-            return Task.CompletedTask;
+            return new List<LeaveRequest>
+            {
+                new LeaveRequest
+                {
+                    Id = 1,
+                    EmployeeId = "EMP001",
+                    EmployeeName = "Sayeed Ahmed",
+                    Days = 3,
+                    StartDate = new DateTime(2025, 7, 20),
+                    EndDate = new DateTime(2025, 7, 22),
+                    LeaveType = "Annual",
+                    Status = "Approved"
+                },
+                new LeaveRequest
+                {
+                    Id = 2,
+                    EmployeeId = "EMP002",
+                    EmployeeName = "Ravi Kumar",
+                    Days = 2,
+                    StartDate = new DateTime(2025, 7, 25),
+                    EndDate = new DateTime(2025, 7, 26),
+                    LeaveType = "Sick",
+                    Status = "Pending"
+                }
+            };
         }
     }
 }
