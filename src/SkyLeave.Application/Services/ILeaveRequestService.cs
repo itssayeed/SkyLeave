@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SkyLeave.Domain.Entities;
+﻿using SkyLeave.Domain.Entities;
 
 namespace SkyLeave.Application.Services
 {

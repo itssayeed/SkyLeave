@@ -41,6 +41,7 @@ namespace SkyLeave.Infrastructure.Repositories
         public Task DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);
+            _context.SaveChangesAsync();
             return Task.CompletedTask;
         }
 
