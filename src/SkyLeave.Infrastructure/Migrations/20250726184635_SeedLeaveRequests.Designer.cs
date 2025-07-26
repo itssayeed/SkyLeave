@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyLeave.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using SkyLeave.Infrastructure.Persistence;
 namespace SkyLeave.Infrastructure.Migrations
 {
     [DbContext(typeof(SkyLeaveDbContext))]
-    partial class SkyLeaveDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250726184635_SeedLeaveRequests")]
+    partial class SeedLeaveRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,7 +69,7 @@ namespace SkyLeave.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1111,
+                            Id = 1,
                             Days = 0,
                             EmployeeId = "",
                             EmployeeName = "Alice Johnson",
@@ -77,7 +80,7 @@ namespace SkyLeave.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = 2111,
+                            Id = 2,
                             Days = 0,
                             EmployeeId = "",
                             EmployeeName = "Bob Smith",
