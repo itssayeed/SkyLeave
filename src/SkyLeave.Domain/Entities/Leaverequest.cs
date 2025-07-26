@@ -1,14 +1,38 @@
 ﻿// src/SkyLeave.Domain/Entities/LeaveRequest.cs
-namespace SkyLeave.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class LeaveRequest
+namespace SkyLeave.Domain.Entities
 {
-    public int Id { get; set; }
-    public string EmployeeId { get; set; } = string.Empty;
-    public string EmployeeName { get; set; } = string.Empty;
-    public int Days { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public string LeaveType { get; set; } = string.Empty;
-    public string Status { get; set; } = "Pending";
+    public class LeaveRequest
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string EmployeeId { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(100)]
+        public string EmployeeName { get; set; } = string.Empty;
+
+        [Range(1, 365)]
+        public int Days { get; set; }
+
+        [Required]
+        public DateTime StartDate { get; set; }
+
+        [Required]
+        public DateTime EndDate { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string LeaveType { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(20)]
+        public string Status { get; set; } = "Pending";
+    }
 }

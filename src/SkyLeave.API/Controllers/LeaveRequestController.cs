@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SkyLeave.Application.Services;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SkyLeave.Domain.Entities;
+using SkyLeave.Infrastructure.Repositories;
 
 namespace SkyLeave.API.Controllers
 {
@@ -7,18 +10,73 @@ namespace SkyLeave.API.Controllers
     [Route("api/[controller]")]
     public class LeaveRequestController : ControllerBase
     {
-        private readonly ILeaveRequestService _leaveRequestService;
+        private readonly IRepository<LeaveRequest> _repository;
 
-        public LeaveRequestController(ILeaveRequestService leaveRequestService)
+        public LeaveRequestController(IRepository<LeaveRequest> repository)
         {
-            _leaveRequestService = leaveRequestService;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<ActionResult<IEnumerable<LeaveRequest>>> GetAll()
         {
-            var data = _leaveRequestService.GetAll();
-            return Ok(data);
+            var allLeaves = await _repository.GetAllAsync();
+            return Ok(allLeaves);
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<LeaveRequest>> GetById(int id)
+        {
+            var leave = await _repository.GetByIdAsync(id);
+            if (leave == null)
+                return NotFound();
+            return leave;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<LeaveRequest>> Create(LeaveRequest request)
+        {
+            var created = await _repository.AddAsync(request);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateLeaveRequest(int id, LeaveRequest leaveRequest)
+        {
+            if (leaveRequest == null)
+                return BadRequest("request body is null");
+
+            if (id != leaveRequest.Id)
+                return BadRequest("ID mismatch");
+
+            var existingLeave = await _repository.GetByIdAsync(id);
+            if (existingLeave == null)
+                return NotFound();
+
+            existingLeave.EmployeeId = leaveRequest.EmployeeId;
+            existingLeave.EmployeeName = leaveRequest.EmployeeName;
+            existingLeave.Days = leaveRequest.Days;
+            existingLeave.StartDate = leaveRequest.StartDate;
+            existingLeave.EndDate = leaveRequest.EndDate;
+            existingLeave.LeaveType = leaveRequest.LeaveType;
+            existingLeave.Status = leaveRequest.Status;
+
+            await _repository.UpdateAsync(existingLeave);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteLeaveRequest(int id)
+        {
+            var leave = await _repository.GetByIdAsync(id);
+            if (leave == null)
+                return NotFound();
+
+            await _repository.DeleteAsync(leave);
+            return NoContent();
+        }
+
     }
 }

@@ -1,17 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using SkyLeave.Application.Services;
-using SkyLeave.Domain.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using SkyLeave.Infrastructure.Persistence;
+
 using SkyLeave.Infrastructure.Repositories;
 
-namespace SkyLeave.Infrastructure.DependencyInjection
+public static class InfrastructureServiceRegistration
 {
-    public static class InfrastructureServiceRegistration
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
-        {
-            services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
-            services.AddScoped<ILeaveRequestService, LeaveRequestService>();
-            return services;
-        }
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+        services.AddDbContext<SkyLeaveDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString("SkyLeaveDbConnection")));
+
+        return services;
     }
 }

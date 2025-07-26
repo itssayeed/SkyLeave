@@ -1,16 +1,13 @@
-using SkyLeave.Application.Services;
-using SkyLeave.Domain.Interfaces;
-using SkyLeave.Infrastructure.DependencyInjection;
-
 var builder = WebApplication.CreateBuilder(args);
+
+
+// Register your application and infrastructure services
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Register your application and infrastructure services
-builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 
