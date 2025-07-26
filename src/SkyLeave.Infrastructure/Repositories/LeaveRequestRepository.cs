@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using SkyLeave.Domain.Entities;
+﻿using SkyLeave.Domain.Entities;
 using SkyLeave.Domain.Interfaces;
 
 namespace SkyLeave.Infrastructure.Repositories
