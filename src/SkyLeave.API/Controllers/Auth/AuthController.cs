@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SkyLeave.Application.DTOs;
 using SkyLeave.Application.Interfaces;
@@ -9,6 +10,7 @@ using System.Text;
 namespace SkyLeave.API.Controllers.Auth
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -20,28 +22,26 @@ namespace SkyLeave.API.Controllers.Auth
             _configuration = configuration;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
-            var user = await _userService.AuthenticateAsync(dto);
+            var user = await _userService.LoginAsync(dto);
             if (user == null)
                 return Unauthorized("Invalid credentials");
 
-            var token = GenerateJwtToken(user.Username,user.Role); 
-            return Ok(new
-            {
-                Token = token,
-                Username = user.Username
-            });
+            var token = GenerateJwtToken(user.Username, user.Role);
+
+            return Ok(new { token, role = user.Role });
         }
 
         private string GenerateJwtToken(string username, string role)
         {
             var claims = new[]
             {
-        new Claim(ClaimTypes.Name, username),
-        new Claim(ClaimTypes.Role, role) 
-    };
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role)
+             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

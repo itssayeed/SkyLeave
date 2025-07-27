@@ -4,6 +4,6 @@ namespace SkyLeave.Application.Interfaces
 {
     public interface IUserService
     {
-        Task<AuthResponseDto> AuthenticateAsync(LoginRequestDto loginDto);
+        Task<AuthResponseDto> LoginAsync(LoginRequestDto loginDto);
     }
 }
