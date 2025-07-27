@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace SkyLeave.Domain.Interfaces
+﻿namespace SkyLeave.Domain.Interfaces
 {
     public interface IRepository<T> where T : class
     {

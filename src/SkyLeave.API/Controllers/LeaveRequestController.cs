@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SkyLeave.Application.Services;
 using SkyLeave.Domain.Entities;
-using SkyLeave.Infrastructure.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace SkyLeave.API.Controllers
 {
@@ -10,77 +11,117 @@ namespace SkyLeave.API.Controllers
     [Route("api/[controller]")]
     public class LeaveRequestController : ControllerBase
     {
-        private readonly IRepository<LeaveRequest> _repository;
+        private readonly ILeaveRequestService _service;
+        private readonly ILogger<LeaveRequestController> _logger;
 
-        public LeaveRequestController(IRepository<LeaveRequest> repository)
+        public LeaveRequestController(ILeaveRequestService service, ILogger<LeaveRequestController> logger)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _service = service ?? throw new ArgumentNullException(nameof(service));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [Authorize(Policy = "Employee")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LeaveRequest>>> GetAll()
         {
-            var allLeaves = await _repository.GetAllAsync();
-            return Ok(allLeaves);
+            try
+            {
+                var allLeaves = await _service.GetAllAsync();
+                _logger.LogInformation("Retrieved {Count} leave requests.", allLeaves?.Count ?? 0);
+                return Ok(allLeaves);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving leave requests.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [Authorize(Policy = "Employee")]
         [HttpGet("{id}")]
         public async Task<ActionResult<LeaveRequest>> GetById(int id)
         {
-            var leave = await _repository.GetByIdAsync(id);
-            if (leave == null)
-                return NotFound();
-            return leave;
+            try
+            {
+                var leave = await _service.GetByIdAsync(id);
+                if (leave == null)
+                    return NotFound();
+                return leave;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving leave request with ID {Id}.", id);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [Authorize(Policy = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<LeaveRequest>> Create(LeaveRequest request)
+        public async Task<ActionResult<LeaveRequest>> Create([FromBody] LeaveRequest request)
         {
-            var created = await _repository.AddAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            if (!ModelState.IsValid || request.EndDate < request.StartDate)
+                return BadRequest("Invalid date range or data.");
+
+            try
+            {
+                var created = await _service.CreateAsync(request);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating leave request.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [Authorize(Policy = "Admin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateLeaveRequest(int id, LeaveRequest leaveRequest)
+        public async Task<ActionResult> UpdateLeaveRequest(int id, [FromBody] LeaveRequest leaveRequest)
         {
-            if (leaveRequest == null)
-                return BadRequest("request body is null");
+            if (!ModelState.IsValid || id != leaveRequest.Id || leaveRequest.EndDate < leaveRequest.StartDate)
+                return BadRequest("Invalid data or ID mismatch");
 
-            if (id != leaveRequest.Id)
-                return BadRequest("ID mismatch");
+            try
+            {
+                var existingLeave = await _service.GetByIdAsync(id);
+                if (existingLeave == null)
+                    return NotFound();
 
-            var existingLeave = await _repository.GetByIdAsync(id);
-            if (existingLeave == null)
-                return NotFound();
+                // Map incoming values to the existing tracked entity
+                existingLeave.EmployeeName = leaveRequest.EmployeeName;
+                existingLeave.StartDate = leaveRequest.StartDate;
+                existingLeave.EndDate = leaveRequest.EndDate;
+                existingLeave.LeaveType = leaveRequest.LeaveType;
+                existingLeave.Status = leaveRequest.Status;
 
-            existingLeave.EmployeeId = leaveRequest.EmployeeId;
-            existingLeave.EmployeeName = leaveRequest.EmployeeName;
-            existingLeave.Days = leaveRequest.Days;
-            existingLeave.StartDate = leaveRequest.StartDate;
-            existingLeave.EndDate = leaveRequest.EndDate;
-            existingLeave.LeaveType = leaveRequest.LeaveType;
-            existingLeave.Status = leaveRequest.Status;
-
-            await _repository.UpdateAsync(existingLeave);
-
-            return NoContent();
+                await _service.UpdateAsync(existingLeave); // Update the existing entity
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating leave request with ID {Id}.", id);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [Authorize(Policy = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLeaveRequest(int id)
         {
-            var leave = await _repository.GetByIdAsync(id);
-            if (leave == null)
-                return NotFound();
+            try
+            {
+                var leave = await _service.GetByIdAsync(id);
+                if (leave == null)
+                    return NotFound();
 
-            await _repository.DeleteAsync(leave);
-            return NoContent();
+                await _service.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting leave request with ID {Id}.", id);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-
     }
 }

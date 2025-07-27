@@ -9,12 +9,36 @@ namespace SkyLeave.Application.Services
 
         public LeaveRequestService(ILeaveRequestRepository leaveRequestRepository)
         {
-            _leaveRequestRepository = leaveRequestRepository;
+            _leaveRequestRepository = leaveRequestRepository ?? throw new ArgumentNullException(nameof(leaveRequestRepository));
         }
 
-        public List<LeaveRequest> GetAll()
+        public async Task<List<LeaveRequest>> GetAllAsync()
         {
-            return _leaveRequestRepository.GetAll();
+            return await _leaveRequestRepository.GetAllAsync() ?? new List<LeaveRequest>();
+        }
+
+        public async Task<LeaveRequest> GetByIdAsync(int id)
+        {
+            return await _leaveRequestRepository.GetByIdAsync(id);
+        }
+
+        public async Task<LeaveRequest> CreateAsync(LeaveRequest request)
+        {
+            _leaveRequestRepository.Add(request);
+            await _leaveRequestRepository.SaveChangesAsync();
+            return request;
+        }
+
+        public async Task UpdateAsync(LeaveRequest request)
+        {
+            _leaveRequestRepository.Update(request);
+            await _leaveRequestRepository.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            await _leaveRequestRepository.DeleteAsync(id);
+            await _leaveRequestRepository.SaveChangesAsync();  // Ensure save after delete
         }
     }
 }

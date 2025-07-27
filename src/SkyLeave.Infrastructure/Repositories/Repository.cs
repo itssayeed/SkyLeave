@@ -1,54 +1,100 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SkyLeave.Domain.Entities;
+using SkyLeave.Domain.Interfaces;
 using SkyLeave.Infrastructure.Persistence;
 
 namespace SkyLeave.Infrastructure.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly SkyLeaveDbContext _context;
-        private readonly DbSet<T> _dbSet;
+        protected readonly SkyLeaveDbContext _context;
+        protected readonly DbSet<T> _dbSet;
 
         public Repository(SkyLeaveDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _dbSet = _context.Set<T>();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public List<T> GetAll()
+        {
+            return _dbSet.ToList();
+        }
+
+        public async Task<List<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public T GetById(int id)
+        {
+            return _dbSet.Find(id);
+        }
+
+        public async Task<T> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<T> AddAsync(T entity)
+        public void Add(T entity)
         {
-            await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync(); 
-            return entity;
+            _dbSet.Add(entity);
         }
 
-        public Task UpdateAsync(T entity)
+        public async Task AddAsync(T entity)
+        {
+            await _dbSet.AddAsync(entity);
+            await SaveChangesAsync();
+        }
+
+        public void Update(T entity)
         {
             _dbSet.Update(entity);
-            _context.SaveChangesAsync();
-            return Task.CompletedTask;
         }
 
-        public Task DeleteAsync(T entity)
+        public void Delete(T entity)
         {
             _dbSet.Remove(entity);
-            _context.SaveChangesAsync();
-            return Task.CompletedTask;
         }
 
-        public async Task SaveASync()
+        public async Task DeleteAsync(int id)
+        {
+            var entity = await _dbSet.FindAsync(id);
+            if (entity != null)
+            {
+                _dbSet.Remove(entity);
+                await SaveChangesAsync();
+            }
+        }
+
+        public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
     }
-}
 
+    public class LeaveRequestRepository : Repository<LeaveRequest>, ILeaveRequestRepository
+    {
+        public LeaveRequestRepository(SkyLeaveDbContext context) : base(context) { }
+
+        public async Task<List<LeaveRequest>> GetByEmployeeAsync(string employeeName)
+        {
+            return await _dbSet.OfType<LeaveRequest>().Where(lr => lr.EmployeeName == employeeName).ToListAsync();
+        }
+
+        public async Task<List<LeaveRequest>> GetByStatusAsync(string status)
+        {
+            return await _dbSet.OfType<LeaveRequest>().Where(lr => lr.Status == status).ToListAsync();
+        }
+
+        public async Task ApproveLeaveRequestAsync(int id, string status)
+        {
+            var leaveRequest = await _dbSet.FindAsync(id);
+            if (leaveRequest != null)
+            {
+                leaveRequest.Status = status;
+                await SaveChangesAsync();
+            }
+        }
+    }
+}

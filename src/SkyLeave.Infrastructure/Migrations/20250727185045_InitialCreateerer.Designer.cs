@@ -12,8 +12,8 @@ using SkyLeave.Infrastructure.Persistence;
 namespace SkyLeave.Infrastructure.Migrations
 {
     [DbContext(typeof(SkyLeaveDbContext))]
-    [Migration("20250726184635_SeedLeaveRequests")]
-    partial class SeedLeaveRequests
+    [Migration("20250727185045_InitialCreateerer")]
+    partial class InitialCreateerer
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,34 +33,23 @@ namespace SkyLeave.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Days")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EmployeeId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("EmployeeName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LeaveType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -69,25 +58,62 @@ namespace SkyLeave.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            Days = 0,
-                            EmployeeId = "",
+                            Id = 1111,
                             EmployeeName = "Alice Johnson",
-                            EndDate = new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Local),
+                            EndDate = new DateTime(2025, 8, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LeaveType = "Vacation",
-                            StartDate = new DateTime(2025, 7, 29, 0, 0, 0, 0, DateTimeKind.Local),
+                            StartDate = new DateTime(2025, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = "Pending"
                         },
                         new
                         {
-                            Id = 2,
-                            Days = 0,
-                            EmployeeId = "",
+                            Id = 2111,
                             EmployeeName = "Bob Smith",
-                            EndDate = new DateTime(2025, 8, 2, 0, 0, 0, 0, DateTimeKind.Local),
+                            EndDate = new DateTime(2025, 8, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LeaveType = "Medical Leave",
-                            StartDate = new DateTime(2025, 7, 30, 0, 0, 0, 0, DateTimeKind.Local),
+                            StartDate = new DateTime(2025, 8, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Status = "Approved"
+                        });
+                });
+
+            modelBuilder.Entity("SkyLeave.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PasswordHash = "$2b$12$tpAcK1BIFHMwdWYYAIAESu3IBjCRA4hhHxAVQSCmf/j2teGletTqK",
+                            Role = "Admin",
+                            Username = "admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PasswordHash = "$2b$12$FQD75CKzriTgSr/6RI8e1uuP1oE0t.GO.WUrv11E.K3waf38iBwlW",
+                            Role = "Employee",
+                            Username = "emp"
                         });
                 });
 #pragma warning restore 612, 618

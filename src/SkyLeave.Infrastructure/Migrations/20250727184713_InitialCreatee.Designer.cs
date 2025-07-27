@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyLeave.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using SkyLeave.Infrastructure.Persistence;
 namespace SkyLeave.Infrastructure.Migrations
 {
     [DbContext(typeof(SkyLeaveDbContext))]
-    partial class SkyLeaveDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250727184713_InitialCreatee")]
+    partial class InitialCreatee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,14 +104,14 @@ namespace SkyLeave.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            PasswordHash = "$2b$12$tpAcK1BIFHMwdWYYAIAESu3IBjCRA4hhHxAVQSCmf/j2teGletTqK",
+                            PasswordHash = "$2a$11$07Zp57XZgrrCDdpyb9qvCuGauLgEqneGwjmS0RdijLXn34DoksgD6",
                             Role = "Admin",
                             Username = "admin"
                         },
                         new
                         {
                             Id = 2,
-                            PasswordHash = "$2b$12$FQD75CKzriTgSr/6RI8e1uuP1oE0t.GO.WUrv11E.K3waf38iBwlW",
+                            PasswordHash = "$2a$11$aEYM02Zs1BgC4YWSwviLju6gbBrcC61S7Bshk3CTvQJC8D101uPcO",
                             Role = "Employee",
                             Username = "emp"
                         });

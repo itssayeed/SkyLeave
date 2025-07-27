@@ -1,61 +1,53 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using SkyLeave.Application.DTOs;
 using SkyLeave.Application.Interfaces;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace SkyLeave.API.Controllers.Auth
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IConfiguration _configuration;
-        public AuthController(IUserService userService, IConfiguration configuration)
+
+        public AuthController(IUserService userService)
         {
-            _userService = userService;
-            _configuration = configuration;
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
-            var user = await _userService.LoginAsync(dto);
-            if (user == null)
-                return Unauthorized("Invalid credentials");
-
-            var token = GenerateJwtToken(user.Username, user.Role);
-
-            return Ok(new { token, role = user.Role });
-        }
-
-        private string GenerateJwtToken(string username, string role)
-        {
-            var claims = new[]
+            if (dto == null)
             {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, role)
-             };
+                return BadRequest("Request body cannot be null. Please provide username and password.");
+            }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: creds
-            );
+            try
+            {
+                var user = await _userService.LoginAsync(dto);
+                if (user == null)
+                {
+                    return Unauthorized("Invalid credentials");
+                }
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                return Ok(new { token = user.Token, role = user.Role });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal error: {ex.Message}");
+            }
         }
-
     }
 }

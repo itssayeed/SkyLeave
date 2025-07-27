@@ -1,4 +1,4 @@
-﻿using SkyLeave.Application.DTOs;
+﻿using SkyLeave.Application.DTOs; 
 
 namespace SkyLeave.Application.Interfaces
 {
