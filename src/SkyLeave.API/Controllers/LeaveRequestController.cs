@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SkyLeave.Domain.Entities;
 using SkyLeave.Infrastructure.Repositories;
 
 namespace SkyLeave.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class LeaveRequestController : ControllerBase
@@ -15,6 +17,7 @@ namespace SkyLeave.API.Controllers
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LeaveRequest>>> GetAll()
         {
@@ -22,6 +25,7 @@ namespace SkyLeave.API.Controllers
             return Ok(allLeaves);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<LeaveRequest>> GetById(int id)
         {
@@ -31,6 +35,7 @@ namespace SkyLeave.API.Controllers
             return leave;
         }
 
+        [Authorize(Roles ="Employee")]
         [HttpPost]
         public async Task<ActionResult<LeaveRequest>> Create(LeaveRequest request)
         {
@@ -38,7 +43,7 @@ namespace SkyLeave.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-
+        [Authorize(Roles = "Employee")]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateLeaveRequest(int id, LeaveRequest leaveRequest)
         {
@@ -65,6 +70,7 @@ namespace SkyLeave.API.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLeaveRequest(int id)
         {
