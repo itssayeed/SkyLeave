@@ -40,5 +40,11 @@ namespace SkyLeave.Application.Services
             await _leaveRequestRepository.DeleteAsync(id);
             await _leaveRequestRepository.SaveChangesAsync();
         }
+        public async Task ApproveLeaveRequestAsync(int id, string status, string approvedBy)
+        {
+            if (!new[] { "Approved", "Rejected" }.Contains(status))
+                throw new ArgumentException("Status must be 'Approved' or 'Rejected'.");
+            await _leaveRequestRepository.ApproveLeaveRequestAsync(id, status, approvedBy);
+        }
     }
 }

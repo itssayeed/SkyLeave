@@ -81,5 +81,17 @@ namespace SkyLeave.API.Controllers
             await _service.DeleteAsync(id);
             return NoContent();
         }
+
+        [Authorize(Policy = "Admin")]
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> ApproveLeaveRequest(int id, [FromBody] ApproveLeaveRequestDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _service.ApproveLeaveRequestAsync(id, request.Status, User.Identity?.Name ?? "Unknown");
+            _logger.LogInformation("Leave request {Id} set to {Status} by {ApprovedBy}.", id, request.Status, User.Identity?.Name);
+            return NoContent();
+        }
     }
 }

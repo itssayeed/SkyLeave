@@ -8,5 +8,7 @@
         public DateTime EndDate { get; set; }
         public string LeaveType { get; set; } = default!;
         public string Status { get; set; } = default!;
+        public string? ApprovedBy { get; set; } = default!;
+        public DateTime? ApprovedOn { get; set; }=default!;
     }
 }

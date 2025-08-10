@@ -1,6 +1,4 @@
 ﻿using SkyLeave.Domain.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SkyLeave.Application.Services
 {
@@ -11,5 +9,6 @@ namespace SkyLeave.Application.Services
         Task<LeaveRequest> CreateAsync(LeaveRequest request);
         Task UpdateAsync(LeaveRequest request);
         Task DeleteAsync(int id);
+        Task ApproveLeaveRequestAsync(int id, string status, string approvedBy);
     }
 }

@@ -91,12 +91,14 @@ namespace SkyLeave.Infrastructure.Repositories
             return await _dbSet.AsNoTracking().Where(lr => lr.Status == status).ToListAsync();
         }
 
-        public async Task ApproveLeaveRequestAsync(int id, string status)
+        public async Task ApproveLeaveRequestAsync(int id, string status, string approvedBy)
         {
             var leaveRequest = await _dbSet.FindAsync(id);
             if (leaveRequest != null)
             {
                 leaveRequest.Status = status;
+                leaveRequest.ApprovedBy = approvedBy;
+                leaveRequest.ApprovedOn = DateTime.UtcNow;
                 await SaveChangesAsync();
             }
         }
