@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SkyLeave.API.Middleware;
+using SkyLeave.API.Validators;
+using FluentValidation.AspNetCore;
+using AutoMapper;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +18,8 @@ builder.Services.AddLogging(logging =>
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LeaveRequestValidator>());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -61,6 +66,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Employee", policy => policy.RequireRole("Employee"));
 });
 
+builder.Services.AddAutoMapper(typeof(Program));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -69,15 +76,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        await context.Response.WriteAsync("An unexpected error occurred.");
-    });
-});
-
+app.UseExceptionMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

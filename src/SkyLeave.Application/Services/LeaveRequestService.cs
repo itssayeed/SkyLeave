@@ -12,9 +12,9 @@ namespace SkyLeave.Application.Services
             _leaveRequestRepository = leaveRequestRepository ?? throw new ArgumentNullException(nameof(leaveRequestRepository));
         }
 
-        public async Task<List<LeaveRequest>> GetAllAsync()
+        public async Task<List<LeaveRequest>> GetAllAsync(int page = 1, int pageSize = 10)
         {
-            return await _leaveRequestRepository.GetAllAsync() ?? new List<LeaveRequest>();
+            return await _leaveRequestRepository.GetByPageAsync(page, pageSize) ?? new List<LeaveRequest>();
         }
 
         public async Task<LeaveRequest> GetByIdAsync(int id)
@@ -38,7 +38,7 @@ namespace SkyLeave.Application.Services
         public async Task DeleteAsync(int id)
         {
             await _leaveRequestRepository.DeleteAsync(id);
-            await _leaveRequestRepository.SaveChangesAsync();  // Ensure save after delete
+            await _leaveRequestRepository.SaveChangesAsync();
         }
     }
 }

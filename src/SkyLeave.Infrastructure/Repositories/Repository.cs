@@ -23,7 +23,7 @@ namespace SkyLeave.Infrastructure.Repositories
 
         public async Task<List<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public T GetById(int id)
@@ -33,7 +33,7 @@ namespace SkyLeave.Infrastructure.Repositories
 
         public async Task<T> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
         }
 
         public void Add(T entity)
@@ -72,19 +72,23 @@ namespace SkyLeave.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
     }
-
     public class LeaveRequestRepository : Repository<LeaveRequest>, ILeaveRequestRepository
     {
         public LeaveRequestRepository(SkyLeaveDbContext context) : base(context) { }
 
         public async Task<List<LeaveRequest>> GetByEmployeeAsync(string employeeName)
         {
-            return await _dbSet.OfType<LeaveRequest>().Where(lr => lr.EmployeeName == employeeName).ToListAsync();
+            return await _dbSet.AsNoTracking().Where(lr => lr.EmployeeName == employeeName).ToListAsync();
+        }
+
+        public async Task<List<LeaveRequest>> GetByPageAsync(int page = 1, int pageSize = 10)
+        {
+            return await _dbSet.AsNoTracking().Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         public async Task<List<LeaveRequest>> GetByStatusAsync(string status)
         {
-            return await _dbSet.OfType<LeaveRequest>().Where(lr => lr.Status == status).ToListAsync();
+            return await _dbSet.AsNoTracking().Where(lr => lr.Status == status).ToListAsync();
         }
 
         public async Task ApproveLeaveRequestAsync(int id, string status)
