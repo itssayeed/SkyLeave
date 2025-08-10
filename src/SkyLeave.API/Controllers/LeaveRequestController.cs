@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SkyLeave.Application.Services;
 using SkyLeave.Domain.Entities;
-using Microsoft.Extensions.Logging;
 
 namespace SkyLeave.API.Controllers
 {
@@ -76,7 +75,7 @@ namespace SkyLeave.API.Controllers
 
         [Authorize(Policy = "Admin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateLeaveRequest(int id, [FromBody] LeaveRequest leaveRequest)
+        public async Task<ActionResult> Update(int id, [FromBody] LeaveRequest leaveRequest)
         {
             if (!ModelState.IsValid || id != leaveRequest.Id || leaveRequest.EndDate < leaveRequest.StartDate)
                 return BadRequest("Invalid data or ID mismatch");
