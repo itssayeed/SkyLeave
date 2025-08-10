@@ -105,7 +105,7 @@ namespace SkyLeave.API.Controllers
 
         [Authorize(Policy = "Admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteLeaveRequest(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
