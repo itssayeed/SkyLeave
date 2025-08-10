@@ -21,5 +21,9 @@
     <ProjectReference Include="..\SkyLeave.Application\SkyLeave.Application.csproj" />
     <ProjectReference Include="..\SkyLeave.Infrastructure\SkyLeave.Infrastructure.csproj" />
   </ItemGroup>
-
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

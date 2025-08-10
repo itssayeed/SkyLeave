@@ -12,8 +12,8 @@ using SkyLeave.Infrastructure.Persistence;
 namespace SkyLeave.Infrastructure.Migrations
 {
     [DbContext(typeof(SkyLeaveDbContext))]
-    [Migration("20250727185045_InitialCreateerer")]
-    partial class InitialCreateerer
+    [Migration("20250810161540_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

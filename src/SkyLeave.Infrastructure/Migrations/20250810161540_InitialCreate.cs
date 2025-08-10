@@ -59,8 +59,8 @@ namespace SkyLeave.Infrastructure.Migrations
                 columns: new[] { "Id", "PasswordHash", "Role", "Username" },
                 values: new object[,]
                 {
-                    { 1, "$2a$11$KbP7zZRZtE2YGkpJyNfC4uMMfUqEk1CTHIwCQXLv6Ze.h/urHzluu", "Admin", "admin" },
-                    { 2, "$2a$11$RiCo4CrrlNAqYPT.MaHM/uHvRL1jBtoiMCvy.YYzFPwF6cYp5RcZ6", "Employee", "emp" }
+                    { 1, "$2b$12$tpAcK1BIFHMwdWYYAIAESu3IBjCRA4hhHxAVQSCmf/j2teGletTqK", "Admin", "admin" },
+                    { 2, "$2b$12$FQD75CKzriTgSr/6RI8e1uuP1oE0t.GO.WUrv11E.K3waf38iBwlW", "Employee", "emp" }
                 });
         }
 
