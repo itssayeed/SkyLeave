@@ -13,6 +13,7 @@ public static class InfrastructureServiceRegistration
     {
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>(); // Changed to specific implementation
+        services.AddScoped<ILeaveBalanceRepository, LeaveBalanceRepository>();
         services.AddScoped<ILeaveRequestService, LeaveRequestService>();
         services.AddScoped<IUserService, UserService>();
         services.AddDbContext<SkyLeaveDbContext>(options =>

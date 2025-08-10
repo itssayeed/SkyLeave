@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SkyLeave.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using SkyLeave.Infrastructure.Persistence;
 namespace SkyLeave.Infrastructure.Migrations
 {
     [DbContext(typeof(SkyLeaveDbContext))]
-    partial class SkyLeaveDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250810190139_AddLeaveBalanceTable")]
+    partial class AddLeaveBalanceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,28 +55,28 @@ namespace SkyLeave.Infrastructure.Migrations
                             Id = 1,
                             AvailableDays = 20,
                             LeaveType = "Vacation",
-                            UserId = 1111
+                            UserId = 1
                         },
                         new
                         {
                             Id = 2,
                             AvailableDays = 10,
                             LeaveType = "Medical Leave",
-                            UserId = 2111
+                            UserId = 1
                         },
                         new
                         {
                             Id = 3,
                             AvailableDays = 15,
                             LeaveType = "Vacation",
-                            UserId = 2113
+                            UserId = 2
                         },
                         new
                         {
                             Id = 4,
                             AvailableDays = 5,
                             LeaveType = "Medical Leave",
-                            UserId = 2119
+                            UserId = 2
                         });
                 });
 
